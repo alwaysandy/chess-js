@@ -25,15 +25,20 @@ body {
 }
 
 .tile {
-    width: 1em;
-    height: 1em;
+    width: 60px;
+    height: 60px;
     border: 1px solid black;
 }
 
 .black-tile {
-    background-color: black;
+    background-color: #3d2b1f;
 }
 
 .white-tile {
-    background-color: white;
+    background-color: #ebe7da;
+}
+
+.piece {
+    width: 60px;
+    height: 60px;
 }

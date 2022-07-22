@@ -30,6 +30,16 @@ function createBoard() {
         }
         boardDiv.appendChild(line);
     }
+
+    return board;
 }
 
-createBoard();
+function placePieces() {
+    const bqueen = document.createElement('img');
+    bqueen.setAttribute("src", "./chessvgs/queen-black.svg")
+    bqueen.classList.add('piece');
+    board[0][0].appendChild(bqueen);
+}
+
+let board = createBoard();
+placePieces();
