@@ -110,9 +110,7 @@ function placePieces(piece, x, whitePieces, blackPieces, pieces) {
     }
 }
 
-function initializePieces(whitePieces, blackPieces) {
-    let pieces = [];
-    
+function initializePieces(pieces, whitePieces, blackPieces) {    
     for (let y = 0; y < board.length; y++) {
         pieces.push([]);
         for (let x = 0; x < board[y].length; x++) {
@@ -150,4 +148,5 @@ function initializePieces(whitePieces, blackPieces) {
 let board = createBoard();
 let whitePieces = [];
 let blackPieces = [];
-let pieces = initializePieces(whitePieces, blackPieces);
+let pieces = [];
+initializePieces(pieces, whitePieces, blackPieces);
