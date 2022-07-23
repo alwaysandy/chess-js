@@ -38,15 +38,19 @@ function createPieceData(piece, colour, directions) {
     pieceData = {
         piece:piece,
         colour:colour,
-    }
+    };
 
     if (piece == "pawn") {
         pieceData.enpassant = false;
         pieceData.firstMove = true;
     }
 
-    if (directions) {
-        pieceData.directions = directions;
+    if (piece == "bishop") {
+        pieceData.directions = ["nw", "ne", "sw", "se"]; 
+    } else if (piece == "rook") {
+        pieceData.directions = ["n", "s", "e", "w"];
+    } else if (piece == "queen") {
+        pieceData.directions = ["n", "s", "e", "w", "nw", "ne", "sw", "se"]; 
     }
 
     return pieceData;
@@ -76,10 +80,38 @@ function createPieceNodes(piece, x) {
     return {black: blackPiece, white: whitePiece};
 }
 
-function placePieces() {
-    let pieces = []
-    let whitePieces = [];
-    let blackPieces = [];
+function placePieces(piece, x, whitePieces, blackPieces, pieces) {
+    // This starts by creating a black and white image element for the
+    // requested piece. It appends those elements to the board, and saves
+    // the metadata to the pieces array.
+    //
+    // The whitePieces and blackPieces arrays hold references to the nodes
+    // themselves. These will be useful when I need to do something with every
+    // single piece on the board.
+    let nodes = createPieceNodes(piece, x);
+    if (piece == "pawn") {
+        board[1][x].appendChild(nodes.black);
+        board[6][x].appendChild(nodes.white);
+        pieces[1][x] = createPieceData(piece, "black");
+        pieces[6][x] = createPieceData(piece, "white");
+    } else {
+        board[0][x].appendChild(nodes.black);
+        board[7][x].appendChild(nodes.white);
+        pieces[0][x] = createPieceData(piece, "black");
+        pieces[7][x] = createPieceData(piece, "white");
+    }
+
+    if (piece == "king") {
+        whitePieces.unshift(nodes.white);
+        blackPieces.unshift(nodes.black);
+    } else {
+        whitePieces.push(nodes.white);
+        blackPieces.push(nodes.black);
+    }
+}
+
+function initializePieces(whitePieces, blackPieces) {
+    let pieces = [];
     
     for (let y = 0; y < board.length; y++) {
         pieces.push([]);
@@ -88,72 +120,34 @@ function placePieces() {
         }
     }
     
-    let nodes;
     for (let x = 0; x < 8; x++) { 
         if (x == 0 || x == 7) {
-            nodes = createPieceNodes("rook", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.push(nodes.white);
-            blackPieces.push(nodes.black);
-            pieces[0][x] = createPieceData("rook", "black", ["n", "s", "e", "w"]);
-            pieces[7][x] = createPieceData("rook", "white", ["n", "s", "e", "w"]);
+            placePieces("rook", x, whitePieces, blackPieces, pieces);
         }
 
         if (x == 1 || x == 6) {
-            nodes = createPieceNodes("knight", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.push(nodes.white);
-            blackPieces.push(nodes.black);
-            pieces[0][x] = createPieceData("knight", "black", []); 
-            pieces[7][x] = createPieceData("knight", "white", []); 
+            placePieces("knight", x, whitePieces, blackPieces, pieces);
         }
 
         if (x == 2 || x == 5) {
-            nodes = createPieceNodes("bishop", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.push(nodes.white);
-            blackPieces.push(nodes.black);
-            pieces[0][x] = createPieceData("bishop", "black", ["nw", "ne", "sw", "se"]); 
-            pieces[7][x] = createPieceData("bishop", "white", ["nw", "ne", "sw", "se"]);
+            placePieces("bishop", x, whitePieces, blackPieces, pieces);
         }
 
         if (x == 3) {
-            nodes = createPieceNodes("queen", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.push(nodes.white);
-            blackPieces.push(nodes.black);
-            pieces[0][x] = createPieceData("queen", "black", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]); 
-            pieces[7][x] = createPieceData("queen", "white", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]);
+            placePieces("queen", x, whitePieces, blackPieces, pieces);
         }
 
         if (x == 4) {
-            nodes = createPieceNodes("king", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.unshift(nodes.white);
-            blackPieces.unshift(nodes.black);
-            pieces[0][x] = createPieceData("king", "black", []); 
-            pieces[7][x] = createPieceData("king", "white", []); 
+            placePieces("king", x, whitePieces, blackPieces, pieces);
         }
 
-        nodes = createPieceNodes("pawn", x);
-        board[1][x].appendChild(nodes.black);
-        board[6][x].appendChild(nodes.white);
-        whitePieces.push(nodes.white);
-        blackPieces.push(nodes.black);
-        pieces[0][x] = createPieceData("pawn", "black", []); 
-        pieces[7][x] = createPieceData("pawn", "white", []); 
+        placePieces("pawn", x, whitePieces, blackPieces, pieces);
     }
 
-    return [pieces, whitePieces, blackPieces]
+    return pieces; 
 }
 
 let board = createBoard();
-let pieceArray = placePieces();
-let pieces = pieceArray[0];
-let whitePieces = pieceArray[1];
-let blackPieces = pieceArray[2];
+let whitePieces = [];
+let blackPieces = [];
+let pieces = initializePieces(whitePieces, blackPieces);
