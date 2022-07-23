@@ -1,7 +1,6 @@
 function createBoard() {
     let board = [];
     const boardDiv = document.querySelector('div.board');
-    console.log(boardDiv);
     for (let y = 0; y < 8; y++) {
         board.push([]);
         const line = document.createElement('div');
@@ -34,7 +33,7 @@ function createBoard() {
     return board;
 }
 
-function createPieceData(piece, colour, directions) {
+function createPieceData(piece, colour) {
     pieceData = {
         piece:piece,
         colour:colour,
@@ -49,7 +48,7 @@ function createPieceData(piece, colour, directions) {
         pieceData.directions = ["nw", "ne", "sw", "se"]; 
     } else if (piece == "rook") {
         pieceData.directions = ["n", "s", "e", "w"];
-    } else if (piece == "queen") {
+    } else if (piece == "queen" || piece == "king") {
         pieceData.directions = ["n", "s", "e", "w", "nw", "ne", "sw", "se"]; 
     }
 
@@ -141,8 +140,138 @@ function initializePieces(pieces, whitePieces, blackPieces) {
 
         placePieces("pawn", x, whitePieces, blackPieces, pieces);
     }
+}
 
-    return pieces; 
+function findMoves(x, y) {
+    let validMoves = [];
+    let p = pieces[y][x];
+    let directionChange = {
+        n: [0, 1],
+        e: [1, 0],
+        s: [0, -1],
+        w: [-1, 0],
+        ne: [1, 1],
+        se: [1, -1],
+        sw: [-1, -1],
+        nw: [-1, 1],
+    };
+
+    if (p.piece == "rook" || p.piece == "bishop" || p.piece == "queen") {
+        for (let d of p.directions) {
+            let cx = x;
+            let cy = y;
+            let dc = directionChange[d];
+            while (true) {
+                cx += dc[0];
+                cy += dc[1];
+                if (cx < 0 || cx > 7 || cy < 0 || cy > 7) {
+                    break;
+                }
+
+                if (pieces[cy][cx]) {
+                    if (pieces[cy][cx].colour !== p.colour) {
+                        validMoves.push([cx, cy]);
+                    }
+
+                    break;
+                } else {
+                    validMoves.push([cx, cy])
+                }
+            }
+        }
+    } else if (p.piece == "knight") {
+        let directions = [
+            [1, 2],
+            [2, 1],
+            [-1, 2],
+            [-2, 1],
+            [1, -2],
+            [2, -1],
+            [-1, -2],
+            [-2, -1]
+        ];
+
+        for (let d of directions) {
+            let cx = x + d[0];
+            let cy = y + d[1];
+            if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
+                continue;
+            }
+
+            if (pieces[cy][cx]) {
+                if (pieces[cy][cx].colour !== p.colour) {
+                    validMoves.push([cx, cy]);
+                }
+            } else {
+                validMoves.push([cx, cy]);
+            }
+        }
+    } else if (p.piece == "king") {
+        for (let d of p.directions) {
+            let cx = x + directionChange[d][0];
+            let cy = y + directionChange[d][1];
+            if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
+                continue;
+            }
+
+            if (pieces[cy][cx]) {
+                if (pieces[cy][cx].colour !== p.colour) {
+                    validMoves.push([cx, cy]);
+                }
+            } else {
+                validMoves.push([cx, cy]);
+            }
+        } 
+    } else if (p.piece == "pawn") {
+        let cy;
+        if (p.colour == "white") {
+            cy = y - 1;
+        } else {
+            cy = y - 1;
+        }
+
+        if (cy <= 7 && cy >= 0) {
+            if (x + 1 <= 7 && pieces[cy][x + 1]) {
+                if (pieces[cy][x + 1].colour !== p.colour) {
+                    validMoves.push([x + 1, cy]);
+                }
+            }
+
+            if (x - 1 >= 0  && pieces[cy][x - 1]) {
+                if (pieces[cy][x - 1].colour !== p.colour) {
+                    validMoves.push([x - 1, cy]);
+                }
+            }
+            if (!pieces[cy][x]) {
+                validMoves.push([x, cy]);
+                if (p.colour == "white") {
+                    cy -= 1;
+                } else {
+                    cy += 1;
+                }
+
+                if (cy <= 7 && cy >= 0) {
+                    if (!pieces[cy][x]) {
+                        validMoves.push([x, cy]);
+                    }
+                }
+            }
+        }
+
+    }
+    
+    return validMoves;
+}
+
+function highlightMoves(moves) {
+    for (let m of moves) {
+        board[m[1]][m[0]].classList.add('highlighted');
+    }
+}
+
+function selectPiece(x, y) {
+    board[y][x].classList.add('highlighted');
+    highlightMoves(findMoves(x, y));
 }
 
 let board = createBoard();
@@ -150,3 +279,9 @@ let whitePieces = [];
 let blackPieces = [];
 let pieces = [];
 initializePieces(pieces, whitePieces, blackPieces);
+
+//pieces[3][3] = createPieceData("pawn", "black");
+//pieces[3][5] = createPieceData("pawn", "black");
+//pieces[2][4] = createPieceData("pawn", "black");
+//pieces[4][4] = createPieceData("pawn", "white");
+selectPiece(4, 4);

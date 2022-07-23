@@ -1,5 +1,5 @@
 * {
-    display: border-box;
+    box-sizing: border-box;
 }
 
 body {
@@ -44,4 +44,8 @@ body {
 .piece {
     width: 65px;
     height: 65px;
+}
+
+.highlighted {
+    border: 2px solid lime;
 }
