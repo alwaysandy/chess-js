@@ -35,14 +35,23 @@ function createBoard() {
 }
 
 function createPieceData(piece, colour, directions) {
-    return {
+    pieceData = {
         piece:piece,
         colour:colour,
-        directions:directions,
     }
+
+    if (piece == "pawn") {
+        pieceData.enpassant = false;
+    }
+
+    if (directions) {
+        pieceData.directions = directions;
+    }
+
+    return pieceData;
 }
 
-function createPieceImageElements(piece) {
+function createPieceNodes(piece, x) {
     let whitePiece = document.createElement('img');
     let blackPiece = document.createElement('img');
     blackPiece.setAttribute("src", `./chessvgs/${piece}-black.svg`);
@@ -50,93 +59,100 @@ function createPieceImageElements(piece) {
     
     blackPiece.classList.add('piece');
     whitePiece.classList.add('piece');
-    return {black: blackPiece, white: whitePiece};
-}
 
-function createAndPlace(piece, offset) {
-    for (let i = 0; i < 2; i++) {
-        const pieces = createPieceImageElements(piece);
-        if (i == 0) {
-            board[0][offset].appendChild(pieces[1]);
-            board[7][offset].appendChild(pieces[0]);
-        } else {
-            board[0][7 - offset].appendChild(pieces[1]);
-            board[7][7 - offset].appendChild(pieces[0]);
-        }
+    if (piece === "pawn") {
+        blackPiece.dataset.x = x;
+        whitePiece.dataset.x = x;
+        blackPiece.dataset.y = 1;
+        whitePiece.dataset.y = 6;
+    } else {
+        blackPiece.dataset.x = x;
+        whitePiece.dataset.x = x;
+        blackPiece.dataset.y = 0;
+        whitePiece.dataset.y = 7;
     }
+
+    return {black: blackPiece, white: whitePiece};
 }
 
 function placePieces() {
     let pieces = []
-    let pieceNodes;
-    for (let x = 0; x < 8; x++) { 
-        if (x == 0 || x == 7) {
-            nodes = createPieceImageElements("rook");
-            nodes.black.dataset.x = x;
-            nodes.black.dataset.y = 0;
-            nodes.white.dataset.x = x;
-            nodes.white.dataset.y = 7;
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-        }
-
-        if (x == 1 || x == 6) {
-            nodes = createPieceImageElements("knight");
-            nodes.black.dataset.x = x;
-            nodes.black.dataset.y = 0;
-            nodes.white.dataset.x = x;
-            nodes.white.dataset.y = 7;
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-        }
-
-        if (x == 2 || x == 5) {
-            nodes = createPieceImageElements("bishop");
-            nodes.black.dataset.x = x;
-            nodes.black.dataset.y = 0;
-            nodes.white.dataset.x = x;
-            nodes.white.dataset.y = 7;
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-        }
-
-        if (x == 3) {
-            nodes = createPieceImageElements("queen");
-            nodes.black.dataset.x = x;
-            nodes.black.dataset.y = 0;
-            nodes.white.dataset.x = x;
-            nodes.white.dataset.y = 7;
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-        }
-
-        if (x == 4) {
-            nodes = createPieceImageElements("king");
-            nodes.black.dataset.x = x;
-            nodes.black.dataset.y = 0;
-            nodes.white.dataset.x = x;
-            nodes.white.dataset.y = 7;
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-        }
-
-        nodes = createPieceImageElements("pawn");
-        nodes.black.dataset.x = x;
-        nodes.black.dataset.y = 1;
-        nodes.white.dataset.x = x;
-        nodes.white.dataset.y = 6;
-        board[1][x].appendChild(nodes.black);
-        board[6][x].appendChild(nodes.white);
-    }
-
-
+    let whitePieces = [];
+    let blackPieces = [];
+    
     for (let y = 0; y < board.length; y++) {
         pieces.push([]);
         for (let x = 0; x < board[y].length; x++) {
            pieces[y].push(0); 
         }
     }
+    
+    let nodes;
+    for (let x = 0; x < 8; x++) { 
+        if (x == 0 || x == 7) {
+            nodes = createPieceNodes("rook", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.push(nodes.white);
+            blackPieces.push(nodes.black);
+            pieces[0][x] = createPieceData("rook", "black", ["n", "s", "e", "w"]);
+            pieces[7][x] = createPieceData("rook", "white", ["n", "s", "e", "w"]);
+        }
+
+        if (x == 1 || x == 6) {
+            nodes = createPieceNodes("knight", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.push(nodes.white);
+            blackPieces.push(nodes.black);
+            pieces[0][x] = createPieceData("knight", "black", []); 
+            pieces[7][x] = createPieceData("knight", "white", []); 
+        }
+
+        if (x == 2 || x == 5) {
+            nodes = createPieceNodes("bishop", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.push(nodes.white);
+            blackPieces.push(nodes.black);
+            pieces[0][x] = createPieceData("bishop", "black", ["nw", "ne", "sw", "se"]); 
+            pieces[7][x] = createPieceData("bishop", "white", ["nw", "ne", "sw", "se"]);
+        }
+
+        if (x == 3) {
+            nodes = createPieceNodes("queen", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.push(nodes.white);
+            blackPieces.push(nodes.black);
+            pieces[0][x] = createPieceData("queen", "black", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]); 
+            pieces[7][x] = createPieceData("queen", "white", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]);
+        }
+
+        if (x == 4) {
+            nodes = createPieceNodes("king", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.push(nodes.white);
+            blackPieces.push(nodes.black);
+            pieces[0][x] = createPieceData("king", "black", []); 
+            pieces[7][x] = createPieceData("king", "white", []); 
+        }
+
+        nodes = createPieceNodes("pawn", x);
+        board[1][x].appendChild(nodes.black);
+        board[6][x].appendChild(nodes.white);
+        whitePieces.push(nodes.white);
+        blackPieces.push(nodes.black);
+        pieces[0][x] = createPieceData("pawn", "black", []); 
+        pieces[7][x] = createPieceData("pawn", "white", []); 
+    }
+
+    return [pieces, whitePieces, blackPieces]
 }
 
 let board = createBoard();
-placePieces();
+let pieceArray = placePieces();
+let pieces = pieceArray[0];
+let whitePieces = pieceArray[1];
+let blackPieces = pieceArray[2];
