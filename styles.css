@@ -27,7 +27,6 @@ body {
 .tile {
     width: 60px;
     height: 60px;
-    border: 1px solid black;
 
     display: flex;
     align-items: center;
@@ -35,7 +34,7 @@ body {
 }
 
 .black-tile {
-    background-color: #3d2b1f;
+    background-color: #836953;
 }
 
 .white-tile {
