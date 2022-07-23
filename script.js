@@ -90,16 +90,6 @@ function placePieces() {
     
     let nodes;
     for (let x = 0; x < 8; x++) { 
-        if (x == 4) {
-            nodes = createPieceNodes("king", x);
-            board[0][x].appendChild(nodes.black);
-            board[7][x].appendChild(nodes.white);
-            whitePieces.push(nodes.white);
-            blackPieces.push(nodes.black);
-            pieces[0][x] = createPieceData("king", "black", []); 
-            pieces[7][x] = createPieceData("king", "white", []); 
-        }
-
         if (x == 0 || x == 7) {
             nodes = createPieceNodes("rook", x);
             board[0][x].appendChild(nodes.black);
@@ -138,6 +128,16 @@ function placePieces() {
             blackPieces.push(nodes.black);
             pieces[0][x] = createPieceData("queen", "black", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]); 
             pieces[7][x] = createPieceData("queen", "white", ["n", "s", "e", "w", "nw", "ne", "sw", "se"]);
+        }
+
+        if (x == 4) {
+            nodes = createPieceNodes("king", x);
+            board[0][x].appendChild(nodes.black);
+            board[7][x].appendChild(nodes.white);
+            whitePieces.unshift(nodes.white);
+            blackPieces.unshift(nodes.black);
+            pieces[0][x] = createPieceData("king", "black", []); 
+            pieces[7][x] = createPieceData("king", "white", []); 
         }
 
         nodes = createPieceNodes("pawn", x);
