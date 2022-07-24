@@ -255,6 +255,81 @@ function checkForCheck() {
     }
 }
 
+function slope(x1, y1, x2, y2) {
+    return (Math.abs((y2 - y1) / (x2 - x1)));
+}
+
+function checkForPin(x, y) {
+    // First see if it's in view of the king
+
+    let kingx, kingy;
+    if (turn === "white") {
+        kingx = parseInt(whitePieces[0].dataset.x);
+        kingy = parseInt(whitePieces[0].dataset.y);
+    } else {
+        kingx = parseInt(blackPieces[0].dataset.x);
+        kingy = parseInt(blackPieces[0].dataset.y);
+    }
+
+    if (y === kingy && x === kingx) {
+        return false;
+    }
+
+    if (x === kingx) {
+        let cy = y;
+        while (true) {
+            cy = cy < kingy ? (cy + 1) : (cy - 1);
+            if (cy === kingy) {
+                break;
+            }
+            if (pieces[cy][x]) {
+                return false;
+            }
+        }
+        
+        cy = y;
+        while (true) {
+            cy = cy < kingy ? (cy - 1) : (cy + 1);
+            if (pieces[cy][x]) {
+                if (pieces[cy][x].colour !== turn &&
+                (pieces[cy][x].piece === "rook" || 
+                pieces[cy][x].piece === "queen")) {
+                    alert("PINNED");
+                    return true;
+                }
+                return false;
+            }
+        }
+    } else if (y == kingy) {
+        let cx = x;
+        while (true) {
+            cx = cx < kingx ? (cx + 1) : (cx - 1);
+            if (cx === kingx) {
+                break;
+            }
+            if (pieces[y][cx]) {
+                return false;
+            }
+        }
+        
+        cx = x;
+        while (true) {
+            cx = cx < kingx ? (cx - 1) : (cx + 1);
+            if (pieces[y][cx]) {
+                if (pieces[y][cx].colour !== turn &&
+                (pieces[y][cx].piece === "rook" || 
+                pieces[y][cx].piece === "queen")) {
+                    alert("PINNED");
+                    return true;
+                }
+                return false;
+            }
+        }
+    } else if (slope(x, y, kingx, kingy) == 1) {
+
+    }
+}
+
 function findMoves(x, y) {
     validMoves = [];
     let p = pieces[y][x];
@@ -418,6 +493,7 @@ function selectPiece(x, y) {
     board[y][x].classList.add('selected');
     selectedPiece[0] = x;
     selectedPiece[1] = y;
+    checkForPin(x, y);
     findMoves(x, y);
     highlightMoves();
 }
