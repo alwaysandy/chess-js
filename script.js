@@ -358,25 +358,17 @@ function checkForPin(x, y) {
                 pieces[cy][cx].piece === "queen")) {
                     if (x > kingx) {
                         if (y < kingy) {
-                            alert("ne");
                             return("ne")
                         } else {
-                            alert("se");
                             return("se");
                         }
-                        alert("e?");
-                        return "ne";
                     } else {
                         if (y < kingy) {
-                            alert("nw?")
                             return "nw";
                         } else {
-                            alert("sw?");
                             return "sw";
                         }
                     }
-                    alert("PINNED");
-                    return true;
                 }
                 return false;
             }
@@ -399,8 +391,39 @@ function findMoves(x, y) {
         nw: [-1, -1],
     };
 
-    if (p.piece == "rook" || p.piece == "bishop" || p.piece == "queen") {
-        for (let d of p.directions) {
+    let pinDirection = checkForPin(x, y);
+
+    if (p.piece === "rook" || p.piece === "bishop" || p.piece === "queen") {
+        let directions;
+        if (pinDirection === "n") {
+            if (p.piece === "bishop") {
+                return;
+            } else {
+                directions = ["n", "s"];
+            }
+        } else if (pinDirection === "e") {
+            if (p.piece === "bishop") {
+                return;
+            } else {
+                directions = ["e", "w"];
+            }
+        } else if (pinDirection === "nw" || pinDirection === "se") {
+            if (p.piece === "rook") {
+                return;
+            } else {
+                directions = ["nw", "se"];
+            }
+        } else if (pinDirection === "ne" || pinDirection === "sw") {
+            if (p.piece === "rook") {
+                return;
+            } else {
+                directions = ["ne", "sw"]; 
+            }
+        } else {
+            directions = p.directions;
+        }
+
+        for (let d of directions) {
             let cx = x;
             let cy = y;
             let dc = directionChange[d];
@@ -423,6 +446,9 @@ function findMoves(x, y) {
             }
         }
     } else if (p.piece == "knight") {
+        if (pinDirection) {
+            return;
+        }
         let directions = [
             [1, 2],
             [2, 1],
@@ -548,7 +574,6 @@ function selectPiece(x, y) {
     board[y][x].classList.add('selected');
     selectedPiece[0] = x;
     selectedPiece[1] = y;
-    checkForPin(x, y);
     findMoves(x, y);
     highlightMoves();
 }
