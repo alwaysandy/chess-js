@@ -285,13 +285,9 @@ function findMoves(x, y) {
             pieces[y][cx].colour !== p.colour && 
             pieces[y][cx].enpassant) {
                 if (p.colour == "white") {
-                    if (!pieces[y - 1][cx]) {
-                        validMoves.push([cx, y - 1]);
-                    }
+                    validMoves.push([cx, y - 1]);
                 } else {
-                    if (!pieces[y + 1][cx]) {
-                        validMoves.push([cx, y + 1]);
-                    }
+                    validMoves.push([cx, y + 1]);
                 }
             }
         }
@@ -306,13 +302,7 @@ function highlightMoves() {
 }
 
 function selectPiece(x, y) {
-    if (selectedPiece[0] !== -1) {
-        board[selectedPiece[1]][selectedPiece[0]].classList.remove('highlighted');
-        for (move of validMoves) {
-            board[move[1]][move[0]].classList.remove('highlighted');
-        }
-    }
-    board[y][x].classList.add('highlighted');
+    board[y][x].classList.add('selected');
     selectedPiece[0] = x;
     selectedPiece[1] = y;
     findMoves(x, y);
@@ -362,14 +352,21 @@ function movePiece(x, y) {
     lastMove = [x, y];
 }
 
+function unhighlight() {
+    if (selectedPiece[0] !== -1) {
+        board[selectedPiece[1]][selectedPiece[0]].classList.remove('selected');
+    }
+
+    for (let m of validMoves) {
+        board[m[1]][m[0]].classList.remove('highlighted');
+    }
+}
+
 function handleClick(t) {
     let x = parseInt(t.target.dataset.x)
     let y = parseInt(t.target.dataset.y);
+    unhighlight();
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
-        board[selectedPiece[1]][selectedPiece[0]].classList.remove('highlighted');
-        for (m of validMoves) {
-            board[m[1]][m[0]].classList.remove('highlighted');
-        }
         movePiece(x, y);
     } else {
         if (pieces[y][x].colour == turn) {
