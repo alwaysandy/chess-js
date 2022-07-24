@@ -323,13 +323,16 @@ function movePiece(x, y) {
     oldx = selectedPiece[0];
     oldy = selectedPiece[1];
     if (pieces[y][x]) {
+        board[y][x].firstChild.dataset.x = -1;
+        board[y][x].firstChild.dataset.y = -1;
         board[y][x].removeChild(board[y][x].firstChild);
-    }
-
-    //En Passant baby
-    if (pieces[oldy][oldx].piece == "pawn") {
-        if (!pieces[y][x] && x !== oldx) {
+    } else if (pieces[oldy][oldx].piece == "pawn") {
+        //EN PASSANT BABY!
+        if (x !== oldx) {
+            board[oldy][x].firstChild.dataset.x = -1;
+            board[oldy][x].firstChild.dataset.y = -1;
             board[oldy][x].removeChild(board[oldy][x].firstChild);
+            pieces[oldy][x] = 0;
         }
     }
 
@@ -337,9 +340,10 @@ function movePiece(x, y) {
     board[y][x].firstChild.dataset.x = x;
     board[y][x].firstChild.dataset.y = y;
 
-    // Whats this? en passant?
     pieces[y][x] = pieces[oldy][oldx];
     pieces[oldy][oldx] = 0;
+    
+    // Whats this? en passant?
     if (pieces[y][x].piece == "pawn") {
         pieces[y][x].firstMove = false;
         if (Math.abs(oldy - y) == 2) {
