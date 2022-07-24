@@ -153,14 +153,14 @@ function checkForCheck() {
     }
     // This is going to fucking suck
     let directionChange = {
-        n: [0, 1],
+        n: [0, -1],
         e: [1, 0],
-        s: [0, -1],
+        s: [0, 1],
         w: [-1, 0],
-        ne: [1, 1],
-        se: [1, -1],
-        sw: [-1, -1],
-        nw: [-1, 1],
+        ne: [1, -1],
+        se: [1, 1],
+        sw: [1, -1],
+        nw: [-1, -1],
     };
 
     let knightDirections = [
@@ -297,8 +297,7 @@ function checkForPin(x, y) {
                 if (pieces[cy][x].colour !== turn &&
                 (pieces[cy][x].piece === "rook" || 
                 pieces[cy][x].piece === "queen")) {
-                    alert("PINNED");
-                    return true;
+                    return "n";
                 }
                 return false;
             }
@@ -325,8 +324,7 @@ function checkForPin(x, y) {
                 if (pieces[y][cx].colour !== turn &&
                 (pieces[y][cx].piece === "rook" || 
                 pieces[y][cx].piece === "queen")) {
-                    alert("PINNED");
-                    return true;
+                    return "e";
                 }
                 return false;
             }
@@ -358,6 +356,25 @@ function checkForPin(x, y) {
                 if (pieces[cy][cx].colour !== turn &&
                 (pieces[cy][cx].piece === "bishop" || 
                 pieces[cy][cx].piece === "queen")) {
+                    if (x > kingx) {
+                        if (y < kingy) {
+                            alert("ne");
+                            return("ne")
+                        } else {
+                            alert("se");
+                            return("se");
+                        }
+                        alert("e?");
+                        return "ne";
+                    } else {
+                        if (y < kingy) {
+                            alert("nw?")
+                            return "nw";
+                        } else {
+                            alert("sw?");
+                            return "sw";
+                        }
+                    }
                     alert("PINNED");
                     return true;
                 }
