@@ -492,6 +492,8 @@ function unhighlight() {
     for (let m of validMoves) {
         board[m[1]][m[0]].classList.remove('highlighted');
     }
+
+    validMovees = [];
 }
 
 function handleClick(t) {
