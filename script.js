@@ -50,6 +50,12 @@ function createPieceData(piece, colour) {
         pieceData.directions = ["n", "s", "e", "w"];
     } else if (piece == "queen" || piece == "king") {
         pieceData.directions = ["n", "s", "e", "w", "nw", "ne", "sw", "se"]; 
+    } else if (piece == "pawn") {
+        if (colour == "white") {
+            pieceData.directions = ["n", "ne", "nw"];
+        } else {
+            pieceData.directions = ["s", "se", "sw"];
+        }
     }
 
     return pieceData;
@@ -492,75 +498,64 @@ function findMoves(x, y) {
             }
         } 
     } else if (p.piece == "pawn") {
-        let cy;
-        if (p.colour == "white") {
-            cy = y - 1;
+        let directions;
+        if (pinDirection) {
+            if (pinDirection == "n") {
+                if (p.colour == "white") {
+                    directions = ["n"];
+                } else {
+                    directions = ["s"];
+                }
+            } else if (pinDirection == "ne" || pinDirection == "sw") {
+                if (p.colour == "white") {
+                    directions = ["ne"];
+                } else {
+                    directions = ["sw"];
+                }
+            } else if (pinDirection == "nw" || pinDirection == "se") {
+                if (p.colour == "white") {
+                    directions = ["nw"];
+                } else {
+                    directions = ["se"];
+                }
+            } else {
+                return;
+            }
         } else {
-            cy = y + 1;
+            directions = p.directions;
         }
 
-        if (cy <= 7 && cy >= 0) {
-            if (x + 1 <= 7 && pieces[cy][x + 1]) {
-                if (pieces[cy][x + 1].colour !== p.colour) {
-                    validMoves.push([x + 1, cy]);
-                }
+        for (let d of directions) {
+            let dc = directionChange[d];
+            let cx = x + dc[0];
+            let cy = y + dc[1];
+
+            if (cx > 7 || cy > 7 || cx < 0 || cy < 0) {
+                continue;
             }
 
-            if (x - 1 >= 0  && pieces[cy][x - 1]) {
-                if (pieces[cy][x - 1].colour !== p.colour) {
-                    validMoves.push([x - 1, cy]);
-                }
-            }
-            if (!pieces[cy][x]) {
-                validMoves.push([x, cy]);
-                if (p.colour == "white") {
-                    cy -= 1;
-                } else {
-                    cy += 1;
-                }
-
-                if (p.firstMove && cy <= 7 && cy >= 0) {
-                    if (!pieces[cy][x]) {
-                        validMoves.push([x, cy]);
+            if (cx !== x) {
+                if (pieces[cy][cx]) {
+                    if (pieces[cy][cx].colour !== p.colour) {
+                        validMoves.push([cx, cy]);
+                    } 
+                } else if (pieces[y][cx]) {
+                    if (pieces[y][cx].piece == "pawn" && 
+                    pieces[y][cx].colour !== p.colour && 
+                    pieces[y][cx].enpassant) {
+                        validMoves.push([cx, cy]);
                     }
                 }
-            }
-        
-        }
-
-        //En Passant
-        let cx = x - 1;
-        if (cx >= 0) {
-            if (pieces[y][cx] && 
-                pieces[y][cx].piece == "pawn" && 
-                pieces[y][cx].colour !== p.colour && 
-                pieces[y][cx].enpassant) {
-                if (p.colour == "white") {
-                    if (!pieces[y - 1][cx]) {
-                        validMoves.push([cx, y - 1]);
-                    }
-                } else {
-                    if (!pieces[y + 1][cx]) {
-                        validMoves.push([cx, y + 1]);
+            } else {
+                if (!pieces[cy][cx]) {
+                    validMoves.push([cx, cy]);
+                    console.log(cy + dc[1]);
+                    if (p.firstMove && !pieces[cy + dc[1]][cx]) {
+                        validMoves.push([cx, (cy + dc[1])]);
                     }
                 }
             }
         }
-
-        cx = x + 1;
-        if (cx <= 7) {
-            if (pieces[y][cx] && 
-            pieces[y][cx].piece == "pawn" && 
-            pieces[y][cx].colour !== p.colour && 
-            pieces[y][cx].enpassant) {
-                if (p.colour == "white") {
-                    validMoves.push([cx, y - 1]);
-                } else {
-                    validMoves.push([cx, y + 1]);
-                }
-            }
-        }
-
     }
 }
 
