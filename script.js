@@ -290,6 +290,9 @@ function checkForPin(x, y) {
         cy = y;
         while (true) {
             cy = cy < kingy ? (cy - 1) : (cy + 1);
+            if (cy > 7 || cy < 0) {
+                return false;
+            }
             if (pieces[cy][x]) {
                 if (pieces[cy][x].colour !== turn &&
                 (pieces[cy][x].piece === "rook" || 
@@ -315,6 +318,9 @@ function checkForPin(x, y) {
         cx = x;
         while (true) {
             cx = cx < kingx ? (cx - 1) : (cx + 1);
+            if (cx > 7 || cx < 0) {
+                return false;
+            }
             if (pieces[y][cx]) {
                 if (pieces[y][cx].colour !== turn &&
                 (pieces[y][cx].piece === "rook" || 
@@ -326,6 +332,38 @@ function checkForPin(x, y) {
             }
         }
     } else if (slope(x, y, kingx, kingy) == 1) {
+        let cx = x;
+        let cy = y;
+        while (true) {
+            cx = cx < kingx ? (cx + 1) : (cx - 1);
+            cy = cy < kingy ? (cy + 1) : (cy - 1);
+            if (cx === kingx) {
+                break;
+            }
+            if (pieces[cy][cx]) {
+                return false;
+            }
+        }
+
+        cx = x;
+        cy = y;
+        while (true) {
+            cx = cx < kingx ? (cx - 1) : (cx + 1);
+            cy = cy < kingy ? (cy - 1) : (cy + 1);
+            if (cy > 7 || cx > 7 || cy < 0 || cx < 0) {
+                return false;
+            }
+            if (pieces[cy][cx]) {
+                console.log(`Found piece at ${cx}, ${cy}`);
+                if (pieces[cy][cx].colour !== turn &&
+                (pieces[cy][cx].piece === "bishop" || 
+                pieces[cy][cx].piece === "queen")) {
+                    alert("PINNED");
+                    return true;
+                }
+                return false;
+            }
+        }
 
     }
 }
