@@ -256,6 +256,44 @@ function findMoves(x, y) {
                     }
                 }
             }
+        
+        }
+
+        //En Passant
+        let cx = x - 1;
+        if (cx >= 0) {
+            if (pieces[y][cx] && 
+                pieces[y][cx].piece == "pawn" && 
+                pieces[y][cx].colour !== p.colour && 
+                pieces[y][cx].enpassant) {
+                if (p.colour == "white") {
+                    if (!pieces[y - 1][cx]) {
+                        validMoves.push([cx, y - 1]);
+                    }
+                } else {
+                    if (!pieces[y + 1][cx]) {
+                        validMoves.push([cx, y + 1]);
+                    }
+                }
+            }
+        }
+
+        cx = x + 1;
+        if (cx <= 7) {
+            if (pieces[y][cx] && 
+            pieces[y][cx].piece == "pawn" && 
+            pieces[y][cx].colour !== p.colour && 
+            pieces[y][cx].enpassant) {
+                if (p.colour == "white") {
+                    if (!pieces[y - 1][cx]) {
+                        validMoves.push([cx, y - 1]);
+                    }
+                } else {
+                    if (!pieces[y + 1][cx]) {
+                        validMoves.push([cx, y + 1]);
+                    }
+                }
+            }
         }
 
     }
@@ -288,26 +326,51 @@ function movePiece(x, y) {
         board[y][x].removeChild(board[y][x].firstChild);
     }
 
+    //En Passant baby
+    if (pieces[oldy][oldx].piece == "pawn") {
+        if (!pieces[y][x] && x !== oldx) {
+            board[oldy][x].removeChild(board[oldy][x].firstChild);
+        }
+    }
+
     board[y][x].appendChild(board[oldy][oldx].firstChild);
     board[y][x].firstChild.dataset.x = x;
     board[y][x].firstChild.dataset.y = y;
 
+    // Whats this? en passant?
     pieces[y][x] = pieces[oldy][oldx];
     pieces[oldy][oldx] = 0;
     if (pieces[y][x].piece == "pawn") {
         pieces[y][x].firstMove = false;
+        if (Math.abs(oldy - y) == 2) {
+            pieces[y][x].enpassant = true;
+        }
     }
+
     selectedPiece = [-1, -1];
     validMoves = [];
+
+    // EN PASSANT BABY
+    turn = turn == "white" ? "black" : "white";
+    if (lastMove[0] !== -1 && pieces[lastMove[1]][lastMove[0]].piece == "pawn") {
+        pieces[lastMove[1]][lastMove[0]].enpassant = false;
+    }
+    lastMove = [x, y];
 }
 
 function handleClick(t) {
     let x = parseInt(t.target.dataset.x)
     let y = parseInt(t.target.dataset.y);
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
+        board[selectedPiece[1]][selectedPiece[0]].classList.remove('highlighted');
+        for (m of validMoves) {
+            board[m[1]][m[0]].classList.remove('highlighted');
+        }
         movePiece(x, y);
     } else {
-        selectPiece(x, y);
+        if (pieces[y][x].colour == turn) {
+            selectPiece(x, y);
+        }
     }
 }
 
@@ -324,6 +387,8 @@ let blackPieces = [];
 let pieces = [];
 let selectedPiece = [-1, -1];
 let validMoves = [];
+let lastMove = [-1, -1];
+let turn = "white";
 initializePieces(pieces, whitePieces, blackPieces);
 
 //pieces[3][3] = createPieceData("pawn", "black");
