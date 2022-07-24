@@ -313,11 +313,18 @@ function movePiece(x, y) {
     oldx = selectedPiece[0];
     oldy = selectedPiece[1];
     if (pieces[y][x]) {
+        // Set the x and y values to -1 so that if I check their position in
+        // the white and black pieces arrays, it will be easy to tell they've
+        // been taken without removing them from those arrays.
         board[y][x].firstChild.dataset.x = -1;
         board[y][x].firstChild.dataset.y = -1;
         board[y][x].removeChild(board[y][x].firstChild);
     } else if (pieces[oldy][oldx].piece == "pawn") {
-        //EN PASSANT BABY!
+        // Qu'est que c'est? En passant??
+        // If the pawn moves to the left or right, it means a piece is taken
+        // Since the pawn moves to where the old piece was, if there's no piece
+        // currently occupying that space, it means the pawn must have been
+        // taken en passant.
         if (x !== oldx) {
             board[oldy][x].firstChild.dataset.x = -1;
             board[oldy][x].firstChild.dataset.y = -1;
@@ -334,6 +341,12 @@ function movePiece(x, y) {
     pieces[oldy][oldx] = 0;
     
     // Whats this? en passant?
+    // Set the en passant flag (meaning the piece can be taken en passant) if
+    // the pawn moves forward by 2 spaces.
+
+    // Also set the firstMove flag to false since the pawn moved, therefore
+    // not allowing the pawn to move forward 2 spaces again.. a bit more
+    // elegant than checking the y coordinate
     if (pieces[y][x].piece == "pawn") {
         pieces[y][x].firstMove = false;
         if (Math.abs(oldy - y) == 2) {
@@ -345,6 +358,10 @@ function movePiece(x, y) {
     validMoves = [];
 
     // EN PASSANT BABY
+    // Also keep track of the last made move.. this is literally just put in
+    // place so that if the pawn moves again the system won't think it can
+    // be taken en passant. (This is seperate from the firstMove flag since
+    // en passant happens after the firstMove flag is set to false).
     turn = turn == "white" ? "black" : "white";
     if (lastMove[0] !== -1 && pieces[lastMove[1]][lastMove[0]].piece == "pawn") {
         pieces[lastMove[1]][lastMove[0]].enpassant = false;
