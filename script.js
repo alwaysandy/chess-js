@@ -142,6 +142,119 @@ function initializePieces(pieces, whitePieces, blackPieces) {
     }
 }
 
+function checkForCheck() {
+    let x, y;
+    if (turn == "white") {
+        x = parseInt(whitePieces[0].dataset.x);
+        y = parseInt(whitePieces[0].dataset.y);
+    } else {
+        x = parseInt(blackPieces[0].dataset.x);
+        y = parseInt(blackPieces[0].dataset.y);
+    }
+    // This is going to fucking suck
+    let directionChange = {
+        n: [0, 1],
+        e: [1, 0],
+        s: [0, -1],
+        w: [-1, 0],
+        ne: [1, 1],
+        se: [1, -1],
+        sw: [-1, -1],
+        nw: [-1, 1],
+    };
+
+    let knightDirections = [
+        [1, 2],
+        [2, 1],
+        [-1, 2],
+        [-2, 1],
+        [1, -2],
+        [2, -1],
+        [-1, -2],
+        [-2, -1]
+    ];
+    
+    for (let direction in directionChange) {
+        let cx = x;
+        let cy = y;
+        let dc = directionChange[direction]; 
+        switch(direction) {
+            case "n":
+            case "e":
+            case "s":
+            case "w":
+                while (true) {
+                    cx += dc[0];
+                    cy += dc[1];
+                    if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
+                        break;
+                    }
+                    
+                    if (pieces[cy][cx]) {
+                        if (pieces[cy][cx].colour !== turn) {
+                            if (pieces[cy][cx].piece == "queen" || 
+                                pieces[cy][cx].piece == "rook") {
+                                alert("Check");
+                                return true;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+                break;
+            default:
+                while (true) {
+                    cx += dc[0];
+                    cy += dc[1];
+                    if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
+                        break;
+                    }
+
+                    if (pieces[cy][cx]) {
+                        if (pieces[cy][cx].colour !== turn) {
+                            if (pieces[cy][cx].piece == "queen" || 
+                                pieces[cy][cx].piece == "bishop") {
+                                alert("Check");
+                                return true;
+                            } else if (pieces[cy][cx].piece == "pawn") {
+                                if (pieces[cy][cx].colour == "white") {
+                                    if (y + 1 == cy) {
+                                        alert("Check");
+                                        return true;
+                                    }
+                                } else {
+                                    if (y - 1 == cy) {
+                                        alert("Check");
+                                        return true;
+                                    }
+                                }
+                            } 
+                        } 
+                         
+                        break;
+                    }
+                }
+        } 
+    }
+
+    for (let dc of knightDirections) {
+        let cx = x + dc[0];
+        let cy = y + dc[1];
+
+        if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
+            continue
+        }
+
+        if (pieces[cy][cx] && 
+            pieces[cy][cx].colour !== turn && 
+            pieces[cy][cx].piece === "knight") {
+            alert("Check");
+            return true;
+        }
+    }
+}
+
 function findMoves(x, y) {
     validMoves = [];
     let p = pieces[y][x];
@@ -367,6 +480,8 @@ function movePiece(x, y) {
         pieces[lastMove[1]][lastMove[0]].enpassant = false;
     }
     lastMove = [x, y];
+
+    checkForCheck();
 }
 
 function unhighlight() {
