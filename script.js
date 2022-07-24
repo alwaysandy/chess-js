@@ -143,7 +143,7 @@ function initializePieces(pieces, whitePieces, blackPieces) {
 }
 
 function findMoves(x, y) {
-    let validMoves = [];
+    validMoves = [];
     let p = pieces[y][x];
     let directionChange = {
         n: [0, 1],
@@ -227,7 +227,7 @@ function findMoves(x, y) {
         if (p.colour == "white") {
             cy = y - 1;
         } else {
-            cy = y - 1;
+            cy = y + 1;
         }
 
         if (cy <= 7 && cy >= 0) {
@@ -250,7 +250,7 @@ function findMoves(x, y) {
                     cy += 1;
                 }
 
-                if (cy <= 7 && cy >= 0) {
+                if (p.firstMove && cy <= 7 && cy >= 0) {
                     if (!pieces[cy][x]) {
                         validMoves.push([x, cy]);
                     }
@@ -259,29 +259,76 @@ function findMoves(x, y) {
         }
 
     }
-    
-    return validMoves;
 }
 
-function highlightMoves(moves) {
-    for (let m of moves) {
+function highlightMoves() {
+    for (let m of validMoves) {
         board[m[1]][m[0]].classList.add('highlighted');
     }
 }
 
 function selectPiece(x, y) {
+    if (selectedPiece[0] !== -1) {
+        board[selectedPiece[1]][selectedPiece[0]].classList.remove('highlighted');
+        for (move of validMoves) {
+            board[move[1]][move[0]].classList.remove('highlighted');
+        }
+    }
     board[y][x].classList.add('highlighted');
-    highlightMoves(findMoves(x, y));
+    selectedPiece[0] = x;
+    selectedPiece[1] = y;
+    findMoves(x, y);
+    highlightMoves();
+}
+
+function movePiece(x, y) {
+    oldx = selectedPiece[0];
+    oldy = selectedPiece[1];
+    if (pieces[y][x]) {
+        board[y][x].removeChild(board[y][x].firstChild);
+    }
+
+    board[y][x].appendChild(board[oldy][oldx].firstChild);
+    board[y][x].firstChild.dataset.x = x;
+    board[y][x].firstChild.dataset.y = y;
+
+    pieces[y][x] = pieces[oldy][oldx];
+    pieces[oldy][oldx] = 0;
+    if (pieces[y][x].piece == "pawn") {
+        pieces[y][x].firstMove = false;
+    }
+    selectedPiece = [-1, -1];
+    validMoves = [];
+}
+
+function handleClick(t) {
+    let x = parseInt(t.target.dataset.x)
+    let y = parseInt(t.target.dataset.y);
+    if (validMoves.find(m => m[0] == x && m[1] == y)) {
+        movePiece(x, y);
+    } else {
+        selectPiece(x, y);
+    }
+}
+
+function addEventListeners() {
+    const tiles = document.querySelectorAll('.tile');
+    tiles.forEach((tile) => {
+        tile.addEventListener('click', handleClick);
+    }); 
 }
 
 let board = createBoard();
 let whitePieces = [];
 let blackPieces = [];
 let pieces = [];
+let selectedPiece = [-1, -1];
+let validMoves = [];
 initializePieces(pieces, whitePieces, blackPieces);
 
 //pieces[3][3] = createPieceData("pawn", "black");
 //pieces[3][5] = createPieceData("pawn", "black");
 //pieces[2][4] = createPieceData("pawn", "black");
 //pieces[4][4] = createPieceData("pawn", "white");
-selectPiece(4, 4);
+//selectPiece(4, 4);
+addEventListeners();
