@@ -384,7 +384,6 @@ function checkForPin(x, y) {
 }
 
 function findMoves(x, y) {
-    validMoves = [];
     let p = pieces[y][x];
     let directionChange = {
         n: [0, -1],
@@ -565,7 +564,47 @@ function highlightMoves() {
     }
 }
 
+function unhighlight() {
+    if (selectedPiece[0] !== -1) {
+        board[selectedPiece[1]][selectedPiece[0]].classList.remove('selected');
+    }
+
+    for (let m of validMoves) {
+        board[m[1]][m[0]].classList.remove('highlighted');
+    }
+
+    validMoves = [];
+    selectedPiece = [-1, -1];
+}
+
+function changePawn(x, y) {
+    let piece;
+    while (true) {
+        piece = prompt("What piece would you like instead? (rook, knight, bishop, queen)")
+        piece = piece.toLowerCase();
+        if (piece === "queen" ||
+        piece === "knight" ||
+        piece === "bishop" ||
+        piece === "rook") {
+            break;
+        }
+    }
+
+    pieces[y][x].piece = piece;    
+    board[y][x].firstChild.setAttribute("src", `./chessvgs/${piece}-white.svg`);
+    if (piece === "queen") {
+        pieces[y][x].directions = ["n", "e", "w", "s", "ne", "nw", "sw", "se"];
+    } else if (piece === "rook") {
+        pieces[y][x].directions = ["n", "e", "w", "s"];
+    } else if (piece === "bishop") {
+        pieces[y][x].directions = ["ne", "nw", "se", "sw"];
+    } else {
+        pieces[y][x].directions = [];
+    }
+}
+
 function selectPiece(x, y) {
+    unhighlight();
     board[y][x].classList.add('selected');
     selectedPiece[0] = x;
     selectedPiece[1] = y;
@@ -577,6 +616,9 @@ function movePiece(x, y) {
     oldx = selectedPiece[0];
     oldy = selectedPiece[1];
     if (pieces[y][x]) {
+        // If there's a piece at the x and y coordinate, it means it was
+        // taken, and can now be removed.
+
         // Set the x and y values to -1 so that if I check their position in
         // the white and black pieces arrays, it will be easy to tell they've
         // been taken without removing them from those arrays.
@@ -611,15 +653,21 @@ function movePiece(x, y) {
     // Also set the firstMove flag to false since the pawn moved, therefore
     // not allowing the pawn to move forward 2 spaces again.. a bit more
     // elegant than checking the y coordinate
+    
+    // Also check here to see if the pawn made it to the end and should be
+    // switched to a piece of choice.
     if (pieces[y][x].piece == "pawn") {
         pieces[y][x].firstMove = false;
         if (Math.abs(oldy - y) == 2) {
             pieces[y][x].enpassant = true;
         }
-    }
 
-    selectedPiece = [-1, -1];
-    validMoves = [];
+        if (pieces[y][x].colour == "white" && y == 0 || 
+        pieces[y][x].colour == "black" && y == 7) {
+            changePawn(x, y);
+        }
+    }
+    
 
     // EN PASSANT BABY
     // Also keep track of the last made move.. this is literally just put in
@@ -633,24 +681,12 @@ function movePiece(x, y) {
     lastMove = [x, y];
 
     checkForCheck();
-}
-
-function unhighlight() {
-    if (selectedPiece[0] !== -1) {
-        board[selectedPiece[1]][selectedPiece[0]].classList.remove('selected');
-    }
-
-    for (let m of validMoves) {
-        board[m[1]][m[0]].classList.remove('highlighted');
-    }
-
-    validMovees = [];
+    unhighlight();
 }
 
 function handleClick(t) {
     let x = parseInt(t.target.dataset.x)
     let y = parseInt(t.target.dataset.y);
-    unhighlight();
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
         movePiece(x, y);
     } else {
