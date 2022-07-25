@@ -238,7 +238,7 @@ function checkForCheck() {
                     }
                 }
         }
-
+    
     }
 
     for (let dc of knightDirections) {
@@ -255,6 +255,8 @@ function checkForCheck() {
             return true;
         }
     }
+
+    return false;
 }
 
 function slope(x1, y1, x2, y2) {
@@ -379,6 +381,11 @@ function checkForPin(x, y) {
 }
 
 function checkMoveLegality(x, y, cx, cy) {
+    let king = pieces[y][x].piece == "king";
+    if (king) {
+        board[y][x].firstChild.dataset.x = cx;
+        board[y][x].firstChild.dataset.y = cy;
+    }
     oldPiece = pieces[cy][cx]; 
 
     pieces[cy][cx] = pieces[y][x];
@@ -386,8 +393,35 @@ function checkMoveLegality(x, y, cx, cy) {
     let c = checkForCheck();
     pieces[y][x] = pieces[cy][cx];
     pieces[cy][cx] = oldPiece;
-
+    if (king) {
+        board[y][x].firstChild.dataset.x = x;
+        board[y][x].firstChild.dataset.y = y;
+    }
     return c;
+}
+
+function checkMate() {
+    let piecesToCheck;
+    if (turn == "white") {
+        piecesToCheck = whitePieces; 
+    } else {
+        piecesToCheck = blackPieces;
+    }
+
+    for (let p of piecesToCheck) {
+        let x = parseInt(p.dataset.x);
+        if (x == -1) {
+            continue;
+        }
+        let y = parseInt(p.dataset.y);
+        findMoves(x, y);
+        if (validMoves.length > 0) {
+            validMoves = []
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function findMoves(x, y) {
@@ -509,8 +543,9 @@ function findMoves(x, y) {
         }
     } else if (p.piece == "king") {
         for (let d of p.directions) {
-            let cx = x + directionChange[d][0];
-            let cy = y + directionChange[d][1];
+            let dc = directionChange[d]
+            let cx = x + dc[0];
+            let cy = y + dc[1];
             if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
                 continue;
             }
@@ -659,15 +694,6 @@ function changePawn(x, y) {
     }
 }
 
-function selectPiece(x, y) {
-    unhighlight();
-    board[y][x].classList.add('selected');
-    selectedPiece[0] = x;
-    selectedPiece[1] = y;
-    findMoves(x, y);
-    highlightMoves();
-}
-
 function movePiece(x, y) {
     oldx = selectedPiece[0];
     oldy = selectedPiece[1];
@@ -736,8 +762,24 @@ function movePiece(x, y) {
     }
     lastMove = [x, y];
 
-    check = checkForCheck();
     unhighlight();
+    check = checkForCheck();
+    if (check) {
+        if (checkMate()) {
+            turn = turn == "white" ? "Black" : "White";
+            alert(`Checkmate! ${turn} wins!`);
+            turn = turn == "White" ? "black" : "white";
+        }
+    }
+}
+
+function selectPiece(x, y) {
+    unhighlight();
+    board[y][x].classList.add('selected');
+    selectedPiece[0] = x;
+    selectedPiece[1] = y;
+    findMoves(x, y);
+    highlightMoves();
 }
 
 function handleClick(t) {
