@@ -380,6 +380,11 @@ function checkForPin(x, y) {
 }
 
 function checkMoveLegality(x, y, cx, cy) {
+    // The way the king coordinates are accessed when checking if a move will
+    // put it in check is by checking the first index of the black/whitePieces
+    // arrays. The issue is those arrays point to the nodes on the board. By
+    // switching the dataset here, it fixes a bug where the king thinks it can
+    // take a piece when that piece is defended, which is illegal.
     let king = pieces[y][x].piece == "king";
     if (king) {
         board[y][x].firstChild.dataset.x = cx;
@@ -671,7 +676,7 @@ function changePawn(x, y) {
     let piece;
     while (true) {
         piece = prompt("What piece would you like instead? (rook, knight, bishop, queen)")
-        piece = piece.toLowerCase();
+        piece = piece.toLowerCase().trim();
         if (piece === "queen" ||
         piece === "knight" ||
         piece === "bishop" ||
@@ -681,7 +686,12 @@ function changePawn(x, y) {
     }
 
     pieces[y][x].piece = piece;
-    board[y][x].firstChild.setAttribute("src", `./chessvgs/${piece}-white.svg`);
+    if (turn == "white") {
+        board[y][x].firstChild.setAttribute("src", `./chessvgs/${piece}-white.svg`);
+    } else {
+        board[y][x].firstChild.setAttribute("src", `./chessvgs/${piece}-black.svg`);
+    }
+
     if (piece === "queen") {
         pieces[y][x].directions = ["n", "e", "w", "s", "ne", "nw", "sw", "se"];
     } else if (piece === "rook") {
