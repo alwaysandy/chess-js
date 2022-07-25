@@ -358,7 +358,6 @@ function checkForPin(x, y) {
                 return false;
             }
             if (pieces[cy][cx]) {
-                console.log(`Found piece at ${cx}, ${cy}`);
                 if (pieces[cy][cx].colour !== turn &&
                 (pieces[cy][cx].piece === "bishop" || 
                 pieces[cy][cx].piece === "queen")) {
@@ -548,7 +547,6 @@ function findMoves(x, y) {
             } else {
                 if (!pieces[cy][cx]) {
                     validMoves.push([cx, cy]);
-                    console.log(cy + dc[1]);
                     if (p.firstMove && !pieces[cy + dc[1]][cx]) {
                         validMoves.push([cx, (cy + dc[1])]);
                     }
@@ -590,7 +588,7 @@ function changePawn(x, y) {
         }
     }
 
-    pieces[y][x].piece = piece;    
+    pieces[y][x].piece = piece;
     board[y][x].firstChild.setAttribute("src", `./chessvgs/${piece}-white.svg`);
     if (piece === "queen") {
         pieces[y][x].directions = ["n", "e", "w", "s", "ne", "nw", "sw", "se"];
