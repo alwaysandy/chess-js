@@ -238,7 +238,6 @@ function checkForCheck() {
                     }
                 }
         }
-    
     }
 
     for (let dc of knightDirections) {
@@ -764,11 +763,13 @@ function movePiece(x, y) {
 
     unhighlight();
     check = checkForCheck();
-    if (check) {
-        if (checkMate()) {
+    if (checkMate()) {
+        if (check) {
             turn = turn == "white" ? "Black" : "White";
             alert(`Checkmate! ${turn} wins!`);
             turn = turn == "White" ? "black" : "white";
+        } else {
+            alert("Tie game! Stalemate!");
         }
     }
 }
@@ -811,10 +812,4 @@ let lastMove = [-1, -1];
 let turn = "white";
 let check = false;
 initializePieces(pieces, whitePieces, blackPieces);
-
-//pieces[3][3] = createPieceData("pawn", "black");
-//pieces[3][5] = createPieceData("pawn", "black");
-//pieces[2][4] = createPieceData("pawn", "black");
-//pieces[4][4] = createPieceData("pawn", "white");
-//selectPiece(4, 4);
 addEventListeners();
