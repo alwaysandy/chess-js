@@ -165,7 +165,7 @@ function checkForCheck() {
         w: [-1, 0],
         ne: [1, -1],
         se: [1, 1],
-        sw: [1, -1],
+        sw: [-1, 1],
         nw: [-1, -1],
     };
 
@@ -200,7 +200,6 @@ function checkForCheck() {
                         if (pieces[cy][cx].colour !== turn) {
                             if (pieces[cy][cx].piece == "queen" || 
                                 pieces[cy][cx].piece == "rook") {
-                                alert("Check");
                                 return true;
                             }
                         }
@@ -221,17 +220,14 @@ function checkForCheck() {
                         if (pieces[cy][cx].colour !== turn) {
                             if (pieces[cy][cx].piece == "queen" || 
                                 pieces[cy][cx].piece == "bishop") {
-                                alert("Check");
                                 return true;
                             } else if (pieces[cy][cx].piece == "pawn") {
                                 if (pieces[cy][cx].colour == "white") {
                                     if (y + 1 == cy) {
-                                        alert("Check");
                                         return true;
                                     }
                                 } else {
                                     if (y - 1 == cy) {
-                                        alert("Check");
                                         return true;
                                     }
                                 }
@@ -241,7 +237,8 @@ function checkForCheck() {
                         break;
                     }
                 }
-        } 
+        }
+
     }
 
     for (let dc of knightDirections) {
@@ -255,7 +252,6 @@ function checkForCheck() {
         if (pieces[cy][cx] && 
             pieces[cy][cx].colour !== turn && 
             pieces[cy][cx].piece === "knight") {
-            alert("Check");
             return true;
         }
     }
@@ -382,6 +378,18 @@ function checkForPin(x, y) {
     }
 }
 
+function checkMoveLegality(x, y, cx, cy) {
+    oldPiece = pieces[cy][cx]; 
+
+    pieces[cy][cx] = pieces[y][x];
+    pieces[y][x] = 0;
+    let c = checkForCheck();
+    pieces[y][x] = pieces[cy][cx];
+    pieces[cy][cx] = oldPiece;
+
+    return c;
+}
+
 function findMoves(x, y) {
     let p = pieces[y][x];
     let directionChange = {
@@ -440,11 +448,21 @@ function findMoves(x, y) {
 
                 if (pieces[cy][cx]) {
                     if (pieces[cy][cx].colour !== p.colour) {
+                        if (check) {
+                            if (checkMoveLegality(x, y, cx, cy)) {
+                                continue;
+                            }
+                        }
                         validMoves.push([cx, cy]);
                     }
 
                     break;
                 } else {
+                    if (check) {
+                        if (checkMoveLegality(x, y, cx, cy)) {
+                            continue;
+                        }
+                    }
                     validMoves.push([cx, cy])
                 }
             }
@@ -473,9 +491,19 @@ function findMoves(x, y) {
 
             if (pieces[cy][cx]) {
                 if (pieces[cy][cx].colour !== p.colour) {
+                    if (check) {
+                        if (checkMoveLegality(x, y, cx, cy)) {
+                            continue;
+                        }
+                    }
                     validMoves.push([cx, cy]);
                 }
             } else {
+                if (check) {
+                    if (checkMoveLegality(x, y, cx, cy)) {
+                        continue;
+                    }
+                }
                 validMoves.push([cx, cy]);
             }
         }
@@ -489,9 +517,19 @@ function findMoves(x, y) {
 
             if (pieces[cy][cx]) {
                 if (pieces[cy][cx].colour !== p.colour) {
+                    if (check) {
+                        if (checkMoveLegality(x, y, cx, cy)) {
+                            continue;
+                        }
+                    }
                     validMoves.push([cx, cy]);
                 }
             } else {
+                if (check) {
+                    if (checkMoveLegality(x, y, cx, cy)) {
+                        continue;
+                    }
+                }
                 validMoves.push([cx, cy]);
             }
         } 
@@ -535,19 +573,39 @@ function findMoves(x, y) {
             if (cx !== x) {
                 if (pieces[cy][cx]) {
                     if (pieces[cy][cx].colour !== p.colour) {
+                        if (check) {
+                            if (checkMoveLegality(x, y, cx, cy)) {
+                                continue;
+                            }
+                        }
                         validMoves.push([cx, cy]);
                     } 
                 } else if (pieces[y][cx]) {
                     if (pieces[y][cx].piece == "pawn" && 
                     pieces[y][cx].colour !== p.colour && 
                     pieces[y][cx].enpassant) {
+                        if (check) {
+                            if (checkMoveLegality(x, y, cx, cy)) {
+                                continue;
+                            }
+                        }
                         validMoves.push([cx, cy]);
                     }
                 }
             } else {
                 if (!pieces[cy][cx]) {
+                    if (check) {
+                        if (checkMoveLegality(x, y, cx, cy)) {
+                            continue;
+                        }
+                    }
                     validMoves.push([cx, cy]);
                     if (p.firstMove && !pieces[cy + dc[1]][cx]) {
+                        if (check) {
+                            if (checkMoveLegality(x, y, cx, (cy + dc[1]))) {
+                                continue;
+                            }
+                        }
                         validMoves.push([cx, (cy + dc[1])]);
                     }
                 }
@@ -678,7 +736,7 @@ function movePiece(x, y) {
     }
     lastMove = [x, y];
 
-    checkForCheck();
+    check = checkForCheck();
     unhighlight();
 }
 
@@ -709,6 +767,7 @@ let selectedPiece = [-1, -1];
 let validMoves = [];
 let lastMove = [-1, -1];
 let turn = "white";
+let check = false;
 initializePieces(pieces, whitePieces, blackPieces);
 
 //pieces[3][3] = createPieceData("pawn", "black");
