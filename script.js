@@ -572,15 +572,12 @@ function findMoves(x, y) {
 
         // Add castling moves
         if (p.firstMove) {
-            console.log("checking castle");
             // King side castle
             if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
                 if (pieces[y][x + 3].piece == "rook" && 
                 pieces[y][x + 3].firstMove) {
-                    console.log("made it here");
                     if (!checkMoveLegality(x, y, x + 1, y) && 
                     !checkMoveLegality(x, y, x + 2, y)) {
-                        console.log("King castle");
                         validMoves.push([x + 2, y]);
                     }
                 } 
