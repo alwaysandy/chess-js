@@ -37,12 +37,8 @@ function createPieceData(piece, colour) {
     pieceData = {
         piece:piece,
         colour:colour,
+        firstMove:true,
     };
-
-    if (piece == "pawn") {
-        pieceData.enpassant = false;
-        pieceData.firstMove = true;
-    }
 
     if (piece == "bishop") {
         pieceData.directions = ["nw", "ne", "sw", "se"]; 
@@ -56,6 +52,7 @@ function createPieceData(piece, colour) {
         } else {
             pieceData.directions = ["s", "se", "sw"];
         }
+        pieceData.enpassant = false;
     }
 
     return pieceData;
@@ -571,7 +568,35 @@ function findMoves(x, y) {
                 }
                 validMoves.push([cx, cy]);
             }
-        } 
+        }
+
+        // Add castling moves
+        if (p.firstMove) {
+            console.log("checking castle");
+            // King side castle
+            if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
+                if (pieces[y][x + 3].piece == "rook" && 
+                pieces[y][x + 3].firstMove) {
+                    console.log("made it here");
+                    if (!checkMoveLegality(x, y, x + 1, y) && 
+                    !checkMoveLegality(x, y, x + 2, y)) {
+                        console.log("King castle");
+                        validMoves.push([x + 2, y]);
+                    }
+                } 
+            }
+
+            // Queen side castle
+            if (!pieces[y][x - 1] && !pieces[y][x - 2] && !pieces[y][x - 3]) {
+                if (pieces[y][x - 4].piece == "rook" &&
+                pieces[y][x - 4].firstMove) {
+                    if (!checkMoveLegality(x, y, x - 1, y) &&
+                    !checkMoveLegality(x, y, x - 2, y)) {
+                        validMoves.push([x - 2, y]);
+                    }
+                }
+            }
+        }
     } else if (p.piece == "pawn") {
         let directions;
         if (pinDirection) {
@@ -727,6 +752,25 @@ function movePiece(x, y) {
             board[oldy][x].firstChild.dataset.y = -1;
             board[oldy][x].removeChild(board[oldy][x].firstChild);
             pieces[oldy][x] = 0;
+        }
+    } else if (pieces[oldy][oldx].piece == "rook") {
+        pieces[oldy][oldx].firstMove = false;
+    } else if (pieces[oldy][oldx].piece == "king") {
+        pieces[oldy][oldx].firstMove = false;
+        // Check if king castled, if so, move the knight node to the correct
+        // position, and update firstMove attribute accordingly.
+        if (Math.abs(oldx - x) === 2) {
+            if (oldx < x) {
+                board[y][5].appendChild(board[y][7].firstChild);
+                pieces[y][5] = pieces[y][7];
+                pieces[y][7] = 0;
+                pieces[y][5].firstMove = false;
+            } else {
+                board[y][3].appendChild(board[y][0].firstChild);
+                pieces[y][3] = pieces[y][0];
+                pieces[y][0] = 0;
+                pieces[y][3].firstMove = false;
+            }
         }
     }
 
