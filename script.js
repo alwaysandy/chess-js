@@ -553,18 +553,14 @@ function findMoves(x, y) {
 
             if (pieces[cy][cx]) {
                 if (pieces[cy][cx].colour !== p.colour) {
-                    if (check) {
-                        if (checkMoveLegality(x, y, cx, cy)) {
-                            continue;
-                        }
+                    if (checkMoveLegality(x, y, cx, cy)) {
+                        continue;
                     }
                     validMoves.push([cx, cy]);
                 }
             } else {
-                if (check) {
-                    if (checkMoveLegality(x, y, cx, cy)) {
-                        continue;
-                    }
+                if (checkMoveLegality(x, y, cx, cy)) {
+                    continue;
                 }
                 validMoves.push([cx, cy]);
             }
@@ -754,15 +750,17 @@ function movePiece(x, y) {
         pieces[oldy][oldx].firstMove = false;
     } else if (pieces[oldy][oldx].piece == "king") {
         pieces[oldy][oldx].firstMove = false;
-        // Check if king castled, if so, move the knight node to the correct
+        // Check if king castled, if so, move the rook node to the correct
         // position, and update firstMove attribute accordingly.
         if (Math.abs(oldx - x) === 2) {
             if (oldx < x) {
+                // King side castle
                 board[y][5].appendChild(board[y][7].firstChild);
                 pieces[y][5] = pieces[y][7];
                 pieces[y][7] = 0;
                 pieces[y][5].firstMove = false;
             } else {
+                // Queen side castle
                 board[y][3].appendChild(board[y][0].firstChild);
                 pieces[y][3] = pieces[y][0];
                 pieces[y][0] = 0;
