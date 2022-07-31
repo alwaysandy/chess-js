@@ -756,15 +756,17 @@ function movePiece(x, y) {
             if (oldx < x) {
                 // King side castle
                 board[y][5].appendChild(board[y][7].firstChild);
+                board[y][5].firstChild.dataset.x = 5;
                 pieces[y][5] = pieces[y][7];
-                pieces[y][7] = 0;
                 pieces[y][5].firstMove = false;
+                pieces[y][7] = 0;
             } else {
                 // Queen side castle
                 board[y][3].appendChild(board[y][0].firstChild);
+                board[y][3].firstChild.dataset.x = 3;
                 pieces[y][3] = pieces[y][0];
-                pieces[y][0] = 0;
                 pieces[y][3].firstMove = false;
+                pieces[y][0] = 0;
             }
         }
     }
@@ -775,7 +777,6 @@ function movePiece(x, y) {
 
     pieces[y][x] = pieces[oldy][oldx];
     pieces[oldy][oldx] = 0;
-    
     // Whats this? en passant?
     // Set the en passant flag (meaning the piece can be taken en passant) if
     // the pawn moves forward by 2 spaces.
