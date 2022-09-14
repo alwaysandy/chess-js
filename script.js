@@ -356,13 +356,9 @@ function checkForPin(x, y) {
                 (pieces[cy][cx].piece === "bishop" || 
                 pieces[cy][cx].piece === "queen")) {
                     if (x > kingx) {
-                        if (y < kingy) {
-                            return("ne")
-                        }
+                        return "ne";
                     } else {
-                        if (y < kingy) {
-                            return "nw";
-                        }
+                        return "nw";
                     }
                 }
                 return false;
