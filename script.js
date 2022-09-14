@@ -358,14 +358,10 @@ function checkForPin(x, y) {
                     if (x > kingx) {
                         if (y < kingy) {
                             return("ne")
-                        } else {
-                            return("se");
                         }
                     } else {
                         if (y < kingy) {
                             return "nw";
-                        } else {
-                            return "sw";
                         }
                     }
                 }
@@ -455,13 +451,13 @@ function findMoves(x, y) {
                 } else {
                     directions = ["e", "w"];
                 }
-            } else if (pinDirection === "nw" || pinDirection === "se") {
+            } else if (pinDirection === "nw") {
                 if (p.piece === "rook") {
                     return;
                 } else {
                     directions = ["nw", "se"];
                 }
-            } else if (pinDirection === "ne" || pinDirection === "sw") {
+            } else if (pinDirection === "ne") {
                 if (p.piece === "rook") {
                     return;
                 } else {
@@ -603,13 +599,13 @@ function findMoves(x, y) {
                 } else {
                     directions = ["s"];
                 }
-            } else if (pinDirection == "ne" || pinDirection == "sw") {
+            } else if (pinDirection == "ne") { 
                 if (p.colour == "white") {
                     directions = ["ne"];
                 } else {
                     directions = ["sw"];
                 }
-            } else if (pinDirection == "nw" || pinDirection == "se") {
+            } else if (pinDirection == "nw") {
                 if (p.colour == "white") {
                     directions = ["nw"];
                 } else {
