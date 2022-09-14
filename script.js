@@ -568,24 +568,26 @@ function findMoves(x, y) {
 
         // Add castling moves
         if (p.firstMove) {
-            // King side castle
-            if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
-                if (pieces[y][x + 3].piece == "rook" && 
-                pieces[y][x + 3].firstMove) {
-                    if (!checkMoveLegality(x, y, x + 1, y) && 
-                    !checkMoveLegality(x, y, x + 2, y)) {
-                        validMoves.push([x + 2, y]);
-                    }
-                } 
-            }
+            if (!checkForCheck()) {
+                // King side castle
+                if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
+                    if (pieces[y][x + 3].piece == "rook" && 
+                    pieces[y][x + 3].firstMove) {
+                        if (!checkMoveLegality(x, y, x + 1, y) && 
+                        !checkMoveLegality(x, y, x + 2, y)) {
+                            validMoves.push([x + 2, y]);
+                        }
+                    } 
+                }
 
-            // Queen side castle
-            if (!pieces[y][x - 1] && !pieces[y][x - 2] && !pieces[y][x - 3]) {
-                if (pieces[y][x - 4].piece == "rook" &&
-                pieces[y][x - 4].firstMove) {
-                    if (!checkMoveLegality(x, y, x - 1, y) &&
-                    !checkMoveLegality(x, y, x - 2, y)) {
-                        validMoves.push([x - 2, y]);
+                // Queen side castle
+                if (!pieces[y][x - 1] && !pieces[y][x - 2] && !pieces[y][x - 3]) {
+                    if (pieces[y][x - 4].piece == "rook" &&
+                    pieces[y][x - 4].firstMove) {
+                        if (!checkMoveLegality(x, y, x - 1, y) &&
+                        !checkMoveLegality(x, y, x - 2, y)) {
+                            validMoves.push([x - 2, y]);
+                        }
                     }
                 }
             }
