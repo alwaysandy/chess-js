@@ -154,7 +154,6 @@ function checkForCheck() {
         x = parseInt(blackPieces[0].dataset.x);
         y = parseInt(blackPieces[0].dataset.y);
     }
-    // This is going to fucking suck
     let directionChange = {
         n: [0, -1],
         e: [1, 0],
@@ -369,11 +368,13 @@ function checkForPin(x, y) {
 }
 
 function checkMoveLegality(x, y, cx, cy) {
-    // The way the king coordinates are accessed when checking if a move will
-    // put it in check is by checking the first index of the black/whitePieces
-    // arrays. The issue is those arrays point to the nodes on the board. By
-    // switching the dataset here, it fixes a bug where the king thinks it can
-    // take a piece when that piece is defended, which is illegal.
+    // The way checkForCheck works is it first gets the coordinats of the king.
+    // These are stored as datasets in the king nodes. Usually, these
+    // coordinates won't have to change, since it gets those coordinates, then
+    // uses the coordinates of the pieces array to check if one of those pieces
+    // puts the king in check. But if the king moves, the dataset needs to be
+    // updated so that it will check whether a move would result in it being put
+    // in check.
     let king = pieces[y][x].piece == "king";
     if (king) {
         board[y][x].firstChild.dataset.x = cx;
@@ -394,6 +395,9 @@ function checkMoveLegality(x, y, cx, cy) {
 }
 
 function checkMate() {
+    // This will check every white / black piece on the board depending on turn.
+    // If there's a move that can be made, it stops running. If there isn't,
+    // then the game is over. Either via checkmate or stalemate.
     let piecesToCheck;
     if (turn == "white") {
         piecesToCheck = whitePieces; 
@@ -418,6 +422,11 @@ function checkMate() {
 }
 
 function findMoves(x, y) {
+    // This works first by checking whether a piece is pinned. If it is, it can
+    // only move in the direction it's pinned in. Then every move in each legal
+    // direction is pushed to the validMoves array to be highlighted later. If
+    // the king is in check, only moves that result in the king being taken out
+    // of check will be pushed.
     let p = pieces[y][x];
     let directionChange = {
         n: [0, -1],
