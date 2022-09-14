@@ -442,29 +442,31 @@ function findMoves(x, y) {
 
     if (p.piece === "rook" || p.piece === "bishop" || p.piece === "queen") {
         let directions;
-        if (pinDirection === "n") {
-            if (p.piece === "bishop") {
-                return;
-            } else {
-                directions = ["n", "s"];
-            }
-        } else if (pinDirection === "e") {
-            if (p.piece === "bishop") {
-                return;
-            } else {
-                directions = ["e", "w"];
-            }
-        } else if (pinDirection === "nw" || pinDirection === "se") {
-            if (p.piece === "rook") {
-                return;
-            } else {
-                directions = ["nw", "se"];
-            }
-        } else if (pinDirection === "ne" || pinDirection === "sw") {
-            if (p.piece === "rook") {
-                return;
-            } else {
-                directions = ["ne", "sw"]; 
+        if (pinDirection) {
+            if (pinDirection === "n") {
+                if (p.piece === "bishop") {
+                    return;
+                } else {
+                    directions = ["n", "s"];
+                }
+            } else if (pinDirection === "e") {
+                if (p.piece === "bishop") {
+                    return;
+                } else {
+                    directions = ["e", "w"];
+                }
+            } else if (pinDirection === "nw" || pinDirection === "se") {
+                if (p.piece === "rook") {
+                    return;
+                } else {
+                    directions = ["nw", "se"];
+                }
+            } else if (pinDirection === "ne" || pinDirection === "sw") {
+                if (p.piece === "rook") {
+                    return;
+                } else {
+                    directions = ["ne", "sw"]; 
+                }
             }
         } else {
             directions = p.directions;
