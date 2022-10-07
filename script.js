@@ -66,6 +66,8 @@ function createPieceNodes(piece, x) {
     
     blackPiece.classList.add('piece');
     whitePiece.classList.add('piece');
+    whitePiece.draggable = true;
+    blackPiece.draggable = true;
 
     if (piece === "pawn") {
         blackPiece.dataset.x = x;
@@ -850,11 +852,34 @@ function handleClick(t) {
     }
 }
 
+function handleDrag(t) {
+    let x = parseInt(t.target.dataset.x)
+    let y = parseInt(t.target.dataset.y);
+    if (pieces[y][x].colour == turn) {
+        selectPiece(x, y);
+    }
+}
+
+function handleDrop(t) {
+    let x = parseInt(t.target.dataset.x)
+    let y = parseInt(t.target.dataset.y);
+    if (validMoves.find(m => m[0] == x && m[1] == y)) {
+        movePiece(x, y);
+    } 
+}
+
 function addEventListeners() {
     const tiles = document.querySelectorAll('.tile');
     tiles.forEach((tile) => {
         tile.addEventListener('click', handleClick);
-    }); 
+        tile.addEventListener("dragover", (e) => e.preventDefault());
+        tile.addEventListener('drop', handleDrop);
+    });
+
+    const pieces = document.querySelectorAll('.piece');
+    pieces.forEach(piece => {
+        piece.addEventListener('dragstart', handleDrag);
+    });
 }
 
 let board = createBoard();
