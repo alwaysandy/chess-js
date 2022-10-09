@@ -843,6 +843,13 @@ function selectPiece(x, y) {
 function handleClick(t) {
     let x = parseInt(t.target.dataset.x)
     let y = parseInt(t.target.dataset.y);
+
+    if (t.target.parentNode.classList.contains('highlighted')) {
+        t.target.parentNode.style = "border-width = 0px";
+    } else {
+        t.target.style = "border-width = 0px;";
+    }
+ 
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
         movePiece(x, y);
     } else {
@@ -863,16 +870,59 @@ function handleDrag(t) {
 function handleDrop(t) {
     let x = parseInt(t.target.dataset.x)
     let y = parseInt(t.target.dataset.y);
+    if (t.target.parentNode.classList.contains('highlighted')) {
+        t.target.parentNode.style = "border-width = 0px";
+    } else {
+        t.target.style = "border-width = 0px;";
+    }
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
         movePiece(x, y);
-    } 
+    }
 }
 
 function addEventListeners() {
     const tiles = document.querySelectorAll('.tile');
     tiles.forEach((tile) => {
         tile.addEventListener('click', handleClick);
-        tile.addEventListener("dragover", (e) => e.preventDefault());
+        tile.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+        tile.addEventListener('dragenter', (e) => {
+            if (e.target.classList.contains('highlighted')) { 
+                e.target.style = "border-color: blue; border-width = 2px;";
+            }
+
+            if (e.target.parentNode.classList.contains('highlighted')) {
+                e.target.parentNode.style = "border-color:blue;border-width=2px";
+            }
+        });
+        
+        tile.addEventListener('dragleave', (e) => {
+            if (e.target.classList.contains('highlighted')) {
+                e.target.style = "border-width = 0px;";
+            }
+            if (e.target.parentNode.classList.contains('highlighted')) {
+                e.target.parentNode.style = "border-width=0";
+            }
+        });
+        tile.addEventListener('mouseenter', (e) => {
+            if (e.target.classList.contains('highlighted')) { 
+                e.target.style = "border-color: blue; border-width = 2px;";
+            }
+
+            if (e.target.parentNode.classList.contains('highlighted')) {
+                e.target.parentNode.style = "border-color:blue;border-width=2px";
+            }
+        });
+        
+        tile.addEventListener('mouseleave', (e) => {
+            if (e.target.classList.contains('highlighted')) {
+                e.target.style = "border-width = 0px;";
+            }
+            if (e.target.parentNode.classList.contains('highlighted')) {
+                e.target.parentNode.style = "border-width=0";
+            }
+        });
         tile.addEventListener('drop', handleDrop);
     });
 
