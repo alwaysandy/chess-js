@@ -876,22 +876,18 @@ function handleDrop(t) {
 }
 
 function handleMouseEnter(e) {
-    if (e.target.classList.contains('highlighted')) { 
-        e.target.style = "border-color: blue; border-width = 2px;";
+    if (e.target.classList.contains('highlighted')) {
+        e.target.classList.add('hovering');
+    } else if (e.target.parentNode.classList.contains('highlighted')) {
+        e.target.parentNode.classList.add('hovering');
     }
-
-    if (e.target.parentNode.classList.contains('highlighted')) {
-        e.target.parentNode.style = "border-color:blue;border-width=2px";
-    } 
 }
 
 function handleMouseLeave(e) {
-    if (e.target.classList.contains('highlighted')) {
-        e.target.style = "border-width = 0px;";
-    }
-
-    if (e.target.parentNode.classList.contains('highlighted')) {
-        e.target.parentNode.style = "border-width=0";
+    if (e.target.classList.contains('hovering')) {
+        e.target.classList.remove('hovering');
+    } else if (e.target.parentNode.classList.contains('hovering')) {
+        e.target.parentNode.classList.remove('hovering');
     }
 }
 
