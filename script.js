@@ -684,7 +684,7 @@ function findMoves(x, y) {
 
 function highlightMoves() {
     for (let m of validMoves) {
-        board[m[1]][m[0]].classList.add('highlighted');
+        board[m[1]][m[0]].classList.add('valid-move');
     }
 }
 
@@ -694,7 +694,7 @@ function unhighlight() {
     }
 
     for (let m of validMoves) {
-        board[m[1]][m[0]].classList.remove('highlighted');
+        board[m[1]][m[0]].classList.remove('valid-move');
     }
 
     validMoves = [];
@@ -876,9 +876,9 @@ function handleDrop(t) {
 }
 
 function handleMouseEnter(e) {
-    if (e.target.classList.contains('highlighted')) {
+    if (e.target.classList.contains('valid-move')) {
         e.target.classList.add('hovering');
-    } else if (e.target.parentNode.classList.contains('highlighted')) {
+    } else if (e.target.parentNode.classList.contains('valid-move')) {
         e.target.parentNode.classList.add('hovering');
     }
 }

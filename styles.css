@@ -48,11 +48,11 @@ body {
     height: 65px;
 }
 
-.highlighted {
+.valid-move {
     border: 2px solid lime;
 }
 
-.highlighted.hovering {
+.valid-move.hovering {
     border: 2px solid blue;
 }
 
