@@ -198,15 +198,17 @@ function checkForCheck() {
                         break;
                     }
                     
-                    if (pieces[cy][cx]) {
-                        if (pieces[cy][cx].colour !== turn) {
-                            if (pieces[cy][cx].piece == "queen" || 
-                                pieces[cy][cx].piece == "rook") {
-                                return true;
-                            }
-                        }
+                    if (!pieces[cy][cx]) {
+                        continue
+                    }
 
+                    if (pieces[cy][cx].colour === turn) {
                         break;
+                    }
+
+                    if (pieces[cy][cx].piece == "queen" || 
+                        pieces[cy][cx].piece == "rook") {
+                        return true;
                     }
                 }
                 break;
@@ -218,26 +220,32 @@ function checkForCheck() {
                         break;
                     }
 
-                    if (pieces[cy][cx]) {
-                        if (pieces[cy][cx].colour !== turn) {
-                            if (pieces[cy][cx].piece == "queen" || 
-                                pieces[cy][cx].piece == "bishop") {
-                                return true;
-                            } else if (pieces[cy][cx].piece == "pawn") {
-                                if (pieces[cy][cx].colour == "white") {
-                                    if (y + 1 == cy) {
-                                        return true;
-                                    }
-                                } else {
-                                    if (y - 1 == cy) {
-                                        return true;
-                                    }
-                                }
-                            } 
-                        } 
-                         
+                    if (!pieces[cy][cx]) {
+                        continue;
+                    }
+
+                    if (pieces[cy][cx].colour === turn) {
                         break;
                     }
+
+                    if (pieces[cy][cx].piece == "queen" || 
+                        pieces[cy][cx].piece == "bishop") {
+                        return true;
+                    }
+
+                    if (pieces[cy][cx].piece == "pawn") {
+                        if (pieces[cy][cx].colour == "white") {
+                            if (y + 1 == cy) {
+                                return true;
+                            }
+                        } else {
+                            if (y - 1 == cy) {
+                                return true;
+                            }
+                        }
+                    } 
+                     
+                    break;
                 }
         }
     }
@@ -247,7 +255,7 @@ function checkForCheck() {
         let cy = y + dc[1];
 
         if (cx < 0 || cy < 0 || cx > 7 || cy > 7) {
-            continue
+            continue;
         }
 
         if (pieces[cy][cx] && 
@@ -318,7 +326,7 @@ function checkForPin(x, y) {
                 return false;
             }
         }
-        
+
         cx = x;
         while (true) {
             cx = cx < kingx ? (cx - 1) : (cx + 1);
@@ -360,7 +368,11 @@ function checkForPin(x, y) {
                 if (pieces[cy][cx].colour !== turn &&
                 (pieces[cy][cx].piece === "bishop" || 
                 pieces[cy][cx].piece === "queen")) {
-                    if (x > kingx) {
+                    if (x > kingx && y > kingy) {
+                        return "nw";
+                    } else if (x < kingx && y > kingy){
+                        return "ne";
+                    } else if(x > kingx && y < kingy) {
                         return "ne";
                     } else {
                         return "nw";
@@ -386,7 +398,7 @@ function checkMoveLegality(x, y, cx, cy) {
         board[y][x].firstChild.dataset.x = cx;
         board[y][x].firstChild.dataset.y = cy;
     }
-    oldPiece = pieces[cy][cx]; 
+    oldPiece = pieces[cy][cx];
 
     pieces[cy][cx] = pieces[y][x];
     pieces[y][x] = 0;
@@ -419,7 +431,7 @@ function checkMate() {
         let y = parseInt(p.dataset.y);
         findMoves(x, y);
         if (validMoves.length > 0) {
-            validMoves = []
+            validMoves = [];
             return false;
         }
     }
@@ -490,25 +502,19 @@ function findMoves(x, y) {
                     break;
                 }
 
+                if (check && checkMoveLegality(x, y, cx, cy)) {
+                    continue;
+                }
+
                 if (pieces[cy][cx]) {
                     if (pieces[cy][cx].colour !== p.colour) {
-                        if (check) {
-                            if (checkMoveLegality(x, y, cx, cy)) {
-                                continue;
-                            }
-                        }
-                        validMoves.push([cx, cy]);
+                        validMoves.push([cx, cy])
                     }
 
                     break;
-                } else {
-                    if (check) {
-                        if (checkMoveLegality(x, y, cx, cy)) {
-                            continue;
-                        }
-                    }
-                    validMoves.push([cx, cy])
                 }
+
+                validMoves.push([cx, cy])
             }
         }
     } else if (p.piece == "knight") {
@@ -533,23 +539,15 @@ function findMoves(x, y) {
                 continue;
             }
 
-            if (pieces[cy][cx]) {
-                if (pieces[cy][cx].colour !== p.colour) {
-                    if (check) {
-                        if (checkMoveLegality(x, y, cx, cy)) {
-                            continue;
-                        }
-                    }
-                    validMoves.push([cx, cy]);
-                }
-            } else {
-                if (check) {
-                    if (checkMoveLegality(x, y, cx, cy)) {
-                        continue;
-                    }
-                }
-                validMoves.push([cx, cy]);
+            if (check && checkMoveLegality(x, y, cx, cy)) {
+                continue;
             }
+
+            if (pieces[cy][cx] && pieces[cy][cx].colour === p.colour) {
+                continue;
+            }
+
+            validMoves.push([cx, cy]);
         }
     } else if (p.piece == "king") {
         for (let d of p.directions) {
@@ -560,44 +558,46 @@ function findMoves(x, y) {
                 continue;
             }
 
+            if (checkMoveLegality(x, y, cx, cy)) {
+                continue;
+            }
+
             if (pieces[cy][cx]) {
-                if (pieces[cy][cx].colour !== p.colour) {
-                    if (checkMoveLegality(x, y, cx, cy)) {
-                        continue;
-                    }
-                    validMoves.push([cx, cy]);
-                }
-            } else {
-                if (checkMoveLegality(x, y, cx, cy)) {
+                if (pieces[cy][cx].colour === p.colour) {
                     continue;
                 }
-                validMoves.push([cx, cy]);
             }
+
+            validMoves.push([cx, cy]);
         }
 
         // Add castling moves
-        if (p.firstMove) {
-            if (!checkForCheck()) {
-                // King side castle
-                if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
-                    if (pieces[y][x + 3].piece == "rook" && 
-                    pieces[y][x + 3].firstMove) {
-                        if (!checkMoveLegality(x, y, x + 1, y) && 
-                        !checkMoveLegality(x, y, x + 2, y)) {
-                            validMoves.push([x + 2, y]);
-                        }
-                    } 
-                }
+        if (!p.firstMove) {
+            return;
+        }
 
-                // Queen side castle
-                if (!pieces[y][x - 1] && !pieces[y][x - 2] && !pieces[y][x - 3]) {
-                    if (pieces[y][x - 4].piece == "rook" &&
-                    pieces[y][x - 4].firstMove) {
-                        if (!checkMoveLegality(x, y, x - 1, y) &&
-                        !checkMoveLegality(x, y, x - 2, y)) {
-                            validMoves.push([x - 2, y]);
-                        }
-                    }
+        if (checkForCheck()) {
+             return;
+        }
+
+        // King side castle
+        if (!pieces[y][x + 1] && !pieces[y][x + 2]) {
+            if (pieces[y][x + 3].piece == "rook" && 
+            pieces[y][x + 3].firstMove) {
+                if (!checkMoveLegality(x, y, x + 1, y) && 
+                !checkMoveLegality(x, y, x + 2, y)) {
+                    validMoves.push([x + 2, y]);
+                }
+            }
+        }
+
+        // Queen side castle
+        if (!pieces[y][x - 1] && !pieces[y][x - 2] && !pieces[y][x - 3]) {
+            if (pieces[y][x - 4].piece == "rook" &&
+            pieces[y][x - 4].firstMove) {
+                if (!checkMoveLegality(x, y, x - 1, y) &&
+                !checkMoveLegality(x, y, x - 2, y)) {
+                    validMoves.push([x - 2, y]);
                 }
             }
         }
@@ -851,11 +851,13 @@ function handleClick(t) {
 
     if (validMoves.find(m => m[0] == x && m[1] == y)) {
         movePiece(x, y);
-    } else {
-        if (pieces[y][x].colour == turn) {
-            selectPiece(x, y);
-        }
+        return;
     }
+
+    if (pieces[y][x].colour == turn) {
+        selectPiece(x, y);
+    }
+    
 }
 
 function handleDrag(t) {
@@ -878,7 +880,10 @@ function handleDrop(t) {
 function handleMouseEnter(e) {
     if (e.target.classList.contains('valid-move')) {
         e.target.classList.add('hovering');
-    } else if (e.target.parentNode.classList.contains('valid-move')) {
+        return;
+    }
+
+    if (e.target.parentNode.classList.contains('valid-move')) {
         e.target.parentNode.classList.add('hovering');
     }
 }
@@ -886,7 +891,10 @@ function handleMouseEnter(e) {
 function handleMouseLeave(e) {
     if (e.target.classList.contains('hovering')) {
         e.target.classList.remove('hovering');
-    } else if (e.target.parentNode.classList.contains('hovering')) {
+        return;
+    }
+
+    if (e.target.parentNode.classList.contains('hovering')) {
         e.target.parentNode.classList.remove('hovering');
     }
 }
