@@ -261,7 +261,8 @@ function checkForCheck() {
 }
 
 function slope(x1, y1, x2, y2) {
-    return (Math.abs((y2 - y1) / (x2 - x1)));
+    return Math.abs(y2 - y1) == Math.abs(x2 - x1) ? 1 : 0;
+    //return (Math.abs((y2 - y1) / (x2 - x1)));
 }
 
 function checkForPin(x, y) {
@@ -465,14 +466,18 @@ function findMoves(x, y) {
             } else if (pinDirection === "nw") {
                 if (p.piece === "rook") {
                     return;
-                } else {
+                } else if (p.colour == "white") {
                     directions = ["nw", "se"];
+                } else {
+                    directions = ["ne", "sw"];
                 }
             } else if (pinDirection === "ne") {
                 if (p.piece === "rook") {
                     return;
-                } else {
+                } else if (p.colour == "white") {
                     directions = ["ne", "sw"]; 
+                } else {
+                    directions = ["nw", "se"];
                 }
             }
         } else {
@@ -614,13 +619,13 @@ function findMoves(x, y) {
                 if (p.colour == "white") {
                     directions = ["ne"];
                 } else {
-                    directions = ["sw"];
+                    directions = ["se"];
                 }
             } else if (pinDirection == "nw") {
                 if (p.colour == "white") {
                     directions = ["nw"];
                 } else {
-                    directions = ["se"];
+                    directions = ["sw"];
                 }
             } else {
                 return;
@@ -894,7 +899,7 @@ function handleMouseLeave(e) {
 function addEventListeners() {
     const tiles = document.querySelectorAll('.tile');
     tiles.forEach((tile) => {
-        tile.addEventListener('click', handleClick);
+        tile.addEventListener('mousedown', handleClick);
         tile.addEventListener("dragover", (e) => {
             e.preventDefault();
         });
